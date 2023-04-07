@@ -1,0 +1,10 @@
+<h3>{{ var }}</h3>
+
+{% for i in mass %}
+
+    <div style="background-color: #eeeeee; margin-top: 10px; text-align: center">
+        <td>{{ i[0] }}</td><br>
+   </div>
+   <img src="../{{i[1]}}" alt="non" style="margin-top: 5px"><br>
+
+{% endfor %}
