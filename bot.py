@@ -41,7 +41,7 @@ async def photo(message: types.Message):
     if message.from_user.id in active_users and active_users[message.from_user.id] == 1:
         await bot.send_message(message.chat.id, "Photo received")
 
-        new_image_name = f"{message.from_user.id}_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.jpg"
+        new_image_name = f"{message.from_user.id}_{message.photo[-1]['file_id']}_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.jpg"
 
         active_photos[message.from_user.id].append(new_image_name)
         await message.photo[-1].download(f"static/photos/{new_image_name}")
