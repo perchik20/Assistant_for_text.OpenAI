@@ -20,7 +20,7 @@ db = sqlite3.connect('test.db')
 
 async def db_get_albums(album_name):
     cursor = db.cursor()
-    cursor.execute(f"SELECT * FROM albums WHERE name = '{album_name}'")
+    cursor.execute(f"SELECT * FROM albums WHERE album_name = '{album_name}'")
     return cursor.fetchall()
 
 @dp.message_handler(commands=['add'])
