@@ -2,8 +2,10 @@ from aiogram import Bot, Dispatcher, executor, types
 import datetime
 import pytesseract
 import cv2
+import sqlite3
 
 from func import add_data
+from random_word import RandomWords
 
 
 TOKEN = "6064236877:AAGQqd0GRgOPmNI3BDjtFKjZc9LhQZhQ-fs"
@@ -14,6 +16,12 @@ active_photos = {}
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
 
+db = sqlite3.connect('test.db')
+
+async def db_get_albums(album_name):
+    cursor = db.cursor()
+    cursor.execute(f"SELECT * FROM albums WHERE name = '{album_name}'")
+    return cursor.fetchall()
 
 @dp.message_handler(commands=['add'])
 async def add(message: types.Message):
@@ -45,6 +53,18 @@ async def photo(message: types.Message):
 
         active_photos[message.from_user.id].append(new_image_name)
         await message.photo[-1].download(f"static/photos/{new_image_name}")
+
+@dp.message_handler(commands=['album'])
+async def gen_album_name(message: types.Message):
+    r = RandomWords()
+    album_name = r.get_random_word()
+
+    cur = db.cursor()
+    while gen_album_name(album_name):
+        album_name = r.get_random_word()
+
+    bot.send_message(message.chat.id, f"{album_name} album name is free")
+
 
 
 @dp.message_handler()
