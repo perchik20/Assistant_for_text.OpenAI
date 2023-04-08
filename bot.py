@@ -18,6 +18,7 @@ dp = Dispatcher(bot)
 
 db = sqlite3.connect('test.db')
 
+
 async def db_get_albums(album_name):
     cursor = db.cursor()
     cursor.execute(f"SELECT * FROM albums WHERE album_name = '{album_name}'")
@@ -30,12 +31,10 @@ async def add(message: types.Message):
 
     if message.from_user.id not in active_users:
         active_users[message.from_user.id] = 0
-        print(active_users)
         await message.answer(f"Added {message.from_user.id} to active users")
 
     if message.from_user.id not in active_photos:
         active_photos[message.from_user.id] = []
-        print(active_photos)
         await message.answer(f"Added {message.from_user.id} to active photos")
 
     await bot.send_message(message.chat.id, "Send me photos, at the end send name of the album")
@@ -70,7 +69,7 @@ async def gen_album_name(message: types.Message):
 @dp.message_handler()
 async def album(message: types.Message):
     global active_users
-    print(active_photos)
+
     if message.from_user.id in active_users and active_users[message.from_user.id] == 1:
         await bot.send_message(message.chat.id, "Album received")
 
@@ -96,4 +95,3 @@ async def parse_photo(photo_filename, album_name):
 
 if __name__ == '__main__':
     executor.start_polling(dp)
-

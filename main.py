@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, jsonify
 from func import get_data
 from itertools import groupby
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
 
 app = Flask(__name__)
 
@@ -23,27 +25,34 @@ def index(var):
 @app.route("/ajaxlivesearch/<var>", methods=["POST", "GET"])
 def ajaxlivesearch(var):
     if request.method == 'POST':
-
         mass=[]
         glob_mass=[]
-
         search_word = request.form['query']
-
         if search_word == '':
             employee = get_data("SELECT * from employee ORDER BY id")
 
         else:
-            print(f'search word -> {search_word}')
-            employee = get_data(f"SELECT * FROM Users WHERE question LIKE '%{search_word}%' AND album_name = '{var}'")
+            employee = get_data(f"SELECT * FROM Users WHERE album_name = '{var}'")
 
-        for i in employee:
-            mass.append(i[1])
-            mass.append(i[2])
-            glob_mass.append(mass)
-            mass = []
-        print(f'mass -> {glob_mass}')
+        counter_fuzzy = 70
+        while len(glob_mass) == 0:
+            for i in employee:
+                if fuzz.partial_ratio(i[1], search_word) > counter_fuzzy:
+                    mass.append(i[1])
+                    mass.append(i[2])
+                    glob_mass.append(mass)
+                    mass = []
+                else:
+                    continue
+
+            if len(glob_mass) == 0:
+                counter_fuzzy -= 5
+            else:
+                break
 
     return jsonify({'htmlresponse': render_template('response.html', mass=glob_mass, var=var)})
+
+
 
 
 if __name__ == "__main__":
