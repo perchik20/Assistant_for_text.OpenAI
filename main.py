@@ -1,38 +1,41 @@
 from flask import Flask, render_template, request, jsonify
-from func import get_data
+from edit_data import get_data
 from itertools import groupby
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 
 app = Flask(__name__)
 
+variant = 'loh'
+
 
 @app.route('/')
-def main():
-    mass = []
-    variants = get_data('SELECT * FROM Users')
-    for i in variants:
-        mass.append(i[3])
-    mass = [el for el, _ in groupby(mass)]
-    return render_template('main.html', var=mass)
+def index():
+    return render_template('index.html')
 
 
-@app.route('/search/<var>')
-def index(var):
-    return render_template('index.html', var=var)
+@app.route("/get_variant", methods=["POST", "GET"])
+def get_variant():
+    global variant
+    if request.method == 'POST':
+        variant = request.form['variant']
+    return variant
 
 
-@app.route("/ajaxlivesearch/<var>", methods=["POST", "GET"])
-def ajaxlivesearch(var):
+@app.route("/ajaxlivesearch", methods=["POST", "GET"])
+def ajaxlivesearch():
     if request.method == 'POST':
         mass=[]
         glob_mass=[]
+
         search_word = request.form['query']
+
+        print(search_word, variant)
+
         if search_word == '':
             employee = get_data("SELECT * from employee ORDER BY id")
-
         else:
-            employee = get_data(f"SELECT * FROM Users WHERE album_name = '{var}'")
+            employee = get_data(f"SELECT * FROM Users WHERE album_name = '{variant}'")
 
         counter_fuzzy = 70
         while len(glob_mass) == 0:
@@ -50,9 +53,14 @@ def ajaxlivesearch(var):
             else:
                 break
 
-    return jsonify({'htmlresponse': render_template('response.html', mass=glob_mass, var=var)})
+    return jsonify({'htmlresponse': render_template('response.html', mass=glob_mass, var=variant)})
 
 
+# @app.route("/grade", methods=["POST", "GET"])
+# def grade():
+#     grade = request.form['contact']
+#     print(grade)
+#     return grade
 
 
 if __name__ == "__main__":

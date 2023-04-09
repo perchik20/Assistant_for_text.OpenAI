@@ -4,7 +4,25 @@
 
     <div style="background-color: #eeeeee; margin-top: 10px; text-align: center">
         <td>{{ i[0] }}</td><br>
-   </div>
-   <img src="../{{i[1]}}" alt="non" style="margin-top: 5px"><br>
+        <img src="../{{i[1]}}" alt="non" style="margin-top: 5px"><br>
+    </div>
+
+    <form>
+      <fieldset>
+        <legend>Do you like this answer:</legend>
+        <div>
+          <input type="radio" id="contactChoice1" name="contact" value="like" />
+          <label for="contactChoice1">👍</label>
+
+          <input type="radio" id="contactChoice2" name="contact" value="dislike" />
+          <label for="contactChoice2">👎🏻</label>
+        </div>
+        <div>
+          <button type="submit">Submit</button>
+        </div>
+      </fieldset>
+    </form>
+
+    <hr>
 
 {% endfor %}

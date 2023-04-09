@@ -3,8 +3,10 @@ import datetime
 import pytesseract
 import cv2
 import sqlite3
+from PIL import Image
+import imagehash as imagehash
 
-from func import add_data
+from edit_data import add_data, get_data
 from random_word import RandomWords
 
 
@@ -12,6 +14,7 @@ TOKEN = "6064236877:AAGQqd0GRgOPmNI3BDjtFKjZc9LhQZhQ-fs"
 
 active_users = {}
 active_photos = {}
+counter = 0
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot)
@@ -23,6 +26,7 @@ async def db_get_albums(album_name):
     cursor = db.cursor()
     cursor.execute(f"SELECT * FROM albums WHERE album_name = '{album_name}'")
     return cursor.fetchall()
+
 
 @dp.message_handler(commands=['add'])
 async def add(message: types.Message):
@@ -53,6 +57,7 @@ async def photo(message: types.Message):
         active_photos[message.from_user.id].append(new_image_name)
         await message.photo[-1].download(f"static/photos/{new_image_name}")
 
+
 @dp.message_handler(commands=['album'])
 async def gen_album_name(message: types.Message):
     r = RandomWords()
@@ -62,8 +67,7 @@ async def gen_album_name(message: types.Message):
     while gen_album_name(album_name):
         album_name = r.get_random_word()
 
-    bot.send_message(message.chat.id, f"{album_name} album name is free")
-
+    await bot.send_message(message.chat.id, f"{album_name} album name is free")
 
 
 @dp.message_handler()
@@ -80,18 +84,28 @@ async def album(message: types.Message):
 
 
 async def parse_photo(photo_filename, album_name):
+    global counter
 
     img = cv2.imread(f'static/photos/{photo_filename}')
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     config = "--oem 3 --psm 6"
     lang = 'rus+eng'
-
     pytesseract.pytesseract.tesseract_cmd = r'/opt/homebrew/bin/tesseract'
 
     question1 = pytesseract.image_to_string(img, lang=lang, config=config)
     question = question1.split(':')
-    add_data(question[0], f'static/photos/{photo_filename}', album_name)
+
+    all_hash = get_data(f"SELECT hash FROM Users WHERE album_name='{album_name}'")
+    hash = imagehash.average_hash(Image.open(f'static/photos/{photo_filename}'))
+
+    for i in all_hash:
+        if i[0] == str(hash):
+            print(f'{hash}->{i[0]}')
+            return 0
+
+    add_data(question[0], f'static/photos/{photo_filename}', album_name, hash)
+
 
 if __name__ == '__main__':
     executor.start_polling(dp)

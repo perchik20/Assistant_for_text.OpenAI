@@ -9,76 +9,21 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
-<script>
-
-function levenshteinDistance(s, t) {
-    if (s.length == 0) return t.length;
-    if (t.length == 0) return s.length;
-
-    var matrix = [];
-
-    for (var i = 0; i <= t.length; i++) {
-        matrix[i] = [i];
-    }
-
-    for (var j = 0; j <= s.length; j++) {
-        matrix[0][j] = j;
-    }
-
-    for (var i = 1; i <= t.length; i++) {
-        for (var j = 1; j <= s.length; j++) {
-            if (t.charAt(i - 1) == s.charAt(j - 1)) {
-                matrix[i][j] = matrix[i - 1][j - 1];
-            } else {
-                matrix[i][j] = Math.min(
-                    matrix[i - 1][j - 1] + 1,
-                    matrix[i][j - 1] + 1,
-                    matrix[i - 1][j] + 1
-                );
-            }
-        }
-    }
-    console.log(matrix[t.length][s.length])
-    return matrix[t.length][s.length];
-}
-
-$(document).ready(function(){
-  load_data();
-  function load_data(query)
-  {
-   $.ajax({
-    url:"/ajaxlivesearch/{{ var }}",
-    method:"POST",
-    data:{query:query},
-    success:function(data)
-    {
-      $('#result').html(data);
-      $("#result").append(data.htmlresponse);
-    }
-   });
-  }
-  
-  $('#search_text').keyup(function(){
-    var search = $(this).val();
-    if(search != ''){
-    load_data(search);
-   }else{
-    load_data();
-   }
-  });
-});
-
-</script>
-
 <style>
     .search-table{
         padding: 10%;
         margin-top: -6%;
     }
+
+    .form-control{
+        margin-top: 5px;
+    }
+
     .search-box{
         background: #c1c1c1;
         border: 1px solid #ababab;
         padding: 3%;
+        margin-top: 10px;
     }
     .search-box input:focus{
         box-shadow:none;
@@ -96,21 +41,89 @@ $(document).ready(function(){
     }
 </style>
 
+<script>
+
+$(document).ready(function(){
+
+  let arr = [];
+
+  load_data();
+  function load_data(query)
+  {
+   $.ajax({
+    url:"/ajaxlivesearch",
+    method:"POST",
+    data:{query:query, query1:'variant2'},
+    success:function(data)
+    {
+      $('#result').html(data);
+      $("#result").append(data.htmlresponse);
+    }
+   });
+  }
+
+  load_data1();
+  function load_data1(query)
+  {
+   $.ajax({
+    url:"/get_variant",
+    method:"POST",
+    data:{variant:query},
+    success:function(data)
+    {
+      $('#result').html(data);
+      $("#result").append(data.htmlresponse);
+     }
+   });
+  }
+
+  $('#search_text').keyup(function(){
+    var search = $(this).val();
+    if(search != ''){
+    console.log(search)
+    load_data(search)
+   }else{
+    console.log('loh')
+   }
+   });
+
+  $('#variant').keyup(function(){
+    var variant = $(this).val();
+    if(variant != ''){
+    console.log(variant)
+    load_data1(variant)
+   }else{
+    console.log('loh')
+   }
+  });
+
+});
+
+</script>
+
 </head>
 <body>
 <div class="container search-table">
-<p><h2 align="center">Live Data Search using Jquery Ajax Python Flask and PostgreSQL Database</h2></p>
+<p><h2 align="center">Live search answer for your questions</h2></p>
+{#            <form method="POST" action="/ajaxlivesearch">#}
+{#                <h3>Write your album nam</h3>#}
+{#                <input type="text" name="variant" id="variant" class="form-control" placeholder="Album Name">#}
+{#                <input type="submit" value="Выбрать">#}
+{#            </form>#}
             <div class="search-box">
                 <div class="row">
                     <div class="col-md-3">
                         <h5>Search Field Name</h5>
                     </div>
                     <div class="col-md-9">
-                        <input type="text" name="search_text" id="search_text" class="form-control" placeholder="Search fields e.g. Cairocoder">
-                    </div> 
+                        <input type="text" name="variant" id="variant" class="form-control" placeholder="Album Name">
+                        <input type="text" name="search_text" id="search_text" class="form-control" placeholder="Search answers">
+                    </div>
                 </div>
             </div>
-   <div id="result"></div>
+   <div id="result">
+
+   </div>
 </div>
 
 </body>
