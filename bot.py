@@ -52,7 +52,7 @@ async def add(message: types.Message):
 @dp.message_handler(content_types=['photo'])
 async def photo(message: types.Message):
     global active_users
-
+    print(message)
     if message.from_user.id in active_users and active_users[message.from_user.id] == 1:
         await bot.send_message(message.chat.id, "Photo received")
 
