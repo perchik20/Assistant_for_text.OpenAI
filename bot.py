@@ -25,7 +25,11 @@ db = sqlite3.connect('test.db')
 async def db_get_albums(album_name):
     cursor = db.cursor()
     cursor.execute(f"SELECT * FROM albums WHERE album_name = '{album_name}'")
-    return cursor.fetchall()
+    result = cursor.fetchall()
+    for line in result:
+        if album_name in line:
+            return False
+    return album_name
 
 
 @dp.message_handler(commands=['add'])
@@ -64,8 +68,12 @@ async def gen_album_name(message: types.Message):
     album_name = r.get_random_word()
 
     cur = db.cursor()
-    while gen_album_name(album_name):
-        album_name = r.get_random_word()
+    while True:
+        check_result = await db_get_albums(album_name)
+        if not check_result:
+            album_name = r.get_random_word()
+        else:
+            break
 
     await bot.send_message(message.chat.id, f"{album_name} album name is free")
 
