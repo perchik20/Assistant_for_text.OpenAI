@@ -10,7 +10,7 @@ from edit_data import add_data, get_data
 from random_word import RandomWords
 
 
-TOKEN = "6064236877:AAGQqd0GRgOPmNI3BDjtFKjZc9LhQZhQ-fs"
+TOKEN = "6186019707:AAGU_qPHzglDiMGg_Kmw8YtB-0YHJne2vyI"
 
 active_users = {}
 active_photos = {}
@@ -96,7 +96,7 @@ async def parse_photo(photo_filename, album_name):
     question1 = pytesseract.image_to_string(img, lang=lang, config=config)
     question = question1.split(':')
 
-    all_hash = get_data(f"SELECT hash FROM Users WHERE album_name='{album_name}'")
+    all_hash = get_data(f"SELECT hash FROM Answers WHERE album_name='{album_name}'")
     hash = imagehash.average_hash(Image.open(f'static/photos/{photo_filename}'))
 
     for i in all_hash:

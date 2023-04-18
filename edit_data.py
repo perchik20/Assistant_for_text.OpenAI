@@ -1,29 +1,28 @@
-import sqlite3
+import psycopg2
 
 
 def add_data(question, answer, album_name, hash):
     try:
-        sqlite_connection = sqlite3.connect('test.db')
-        cursor = sqlite_connection.cursor()
+        conn = psycopg2.connect(dbname="metanit", user="postgres", password="School1367", host="127.0.0.1")
+        cursor = conn.cursor()
         print("Подключен к SQLite")
 
-        sqlite_insert_query = f"INSERT INTO Users (question, answer, album_name, hash) VALUES ('{question}', '{answer}', '{album_name}', '{hash}');"
-        count = cursor.execute(sqlite_insert_query)
-        sqlite_connection.commit()
+        sqlite_insert_query = f"INSERT INTO Answers (question, answer, album_name, hash) VALUES ('{question}', '{answer}', '{album_name}', '{hash}');"
+        cursor.execute(sqlite_insert_query)
+        conn.commit()
         print("Запись успешно вставлена в таблицу sqlitedb_developers ", cursor.rowcount)
         cursor.close()
 
-    except sqlite3.Error as error:
+    except (Exception, psycopg2.Error) as error:
         print("Ошибка при работе с SQLite", error)
     finally:
-        if sqlite_connection:
-            sqlite_connection.close()
+        if conn:
+            conn.close()
 
 
 def get_data(text):
     try:
-        records1 = []
-        conn = sqlite3.connect('test.db')
+        conn = psycopg2.connect(dbname="metanit", user="postgres", password="School1367", host="127.0.0.1")
         cursor = conn.cursor()
         method = text
         cursor.execute(method)
@@ -31,7 +30,7 @@ def get_data(text):
 
         return records
 
-    except sqlite3.Error as error:
+    except (Exception, psycopg2.Error) as error:
         print("Ошибка при работе с SQLite", error)
 
     finally:
