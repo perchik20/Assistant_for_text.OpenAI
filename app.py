@@ -5,7 +5,7 @@ from fuzzywuzzy import fuzz
 
 app = Flask(__name__)
 
-variant = 'loh'
+variant = 'var1'
 
 
 @app.route('/')
