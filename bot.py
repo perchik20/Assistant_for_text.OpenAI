@@ -10,7 +10,7 @@ from edit_data import add_data, get_data
 from random_word import RandomWords
 
 
-TOKEN = "6186019707:AAGU_qPHzglDiMGg_Kmw8YtB-0YHJne2vyI"
+TOKEN = "yout:TOKEN"
 
 active_users = {}
 active_photos = {}
